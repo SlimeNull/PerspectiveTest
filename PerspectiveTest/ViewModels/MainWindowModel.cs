@@ -22,9 +22,8 @@ namespace PerspectiveTest.ViewModels
         private readonly DependentValue<Quad, Quad, Mat> _sourceToDestinationMatrix = new DependentValue<Quad, Quad, Mat>((sourceQuad, destQuad) =>
         {
             return Cv2.GetPerspectiveTransform(
-                ((System.Windows.Point[])[sourceQuad.LeftTop, sourceQuad.LeftBottom, sourceQuad.RightTop, sourceQuad.RightBottom]).Select(p => new Point2f((float)p.X, (float)p.Y)),
-                ((System.Windows.Point[])[sourceQuad.LeftTop, sourceQuad.LeftBottom, sourceQuad.RightTop, sourceQuad.RightBottom]).Select(p => new Point2f((float)p.X, (float)p.Y)));
-                //((System.Windows.Point[])[destQuad.LeftTop, destQuad.RightTop, destQuad.RightBottom, destQuad.LeftBottom]).Select(p => new Point2f((float)p.X, (float)p.Y)));
+                ((System.Windows.Point[])[sourceQuad.LeftTop, sourceQuad.RightTop, sourceQuad.RightBottom, sourceQuad.LeftBottom]).Select(p => new Point2f((float)p.X, (float)p.Y)),
+                ((System.Windows.Point[])[destQuad.LeftTop, destQuad.RightTop, destQuad.RightBottom, destQuad.LeftBottom]).Select(p => new Point2f((float)p.X, (float)p.Y)));
         });
 
         private readonly DependentValue<Quad, Mat> _normalizedToDestinationMatrix = new DependentValue<Quad, Mat>((destQuad) =>
@@ -110,9 +109,23 @@ namespace PerspectiveTest.ViewModels
         public Mat NormalizedToSourceMatrix => _normalizedToDestinationMatrix.Get(
             new Quad(new WpfPoint(SourceAreaX1, SourceAreaY1), new WpfPoint(SourceAreaX2, SourceAreaY2), new WpfPoint(SourceAreaX3, SourceAreaY3), new WpfPoint(SourceAreaX4, SourceAreaY4)));
 
-        public Mat SourceToDestinationMatrix => _sourceToDestinationMatrix.Get(
-            new Quad(new WpfPoint(SourceAreaX1, SourceAreaY1), new WpfPoint(SourceAreaX2, SourceAreaY2), new WpfPoint(SourceAreaX3, SourceAreaY3), new WpfPoint(SourceAreaX4, SourceAreaY4)),
-            new Quad(new WpfPoint(DestinationAreaX1, DestinationAreaY1), new WpfPoint(DestinationAreaX2, DestinationAreaY2), new WpfPoint(DestinationAreaX3, DestinationAreaY3), new WpfPoint(DestinationAreaX4, DestinationAreaY4)));
+        public Mat SourceToDestinationMatrix
+        {
+            get
+            {
+                var ret = _sourceToDestinationMatrix.Get(
+                    new Quad(new WpfPoint(SourceAreaX1, SourceAreaY1), new WpfPoint(SourceAreaX2, SourceAreaY2), new WpfPoint(SourceAreaX3, SourceAreaY3), new WpfPoint(SourceAreaX4, SourceAreaY4)),
+                    new Quad(new WpfPoint(DestinationAreaX1, DestinationAreaY1), new WpfPoint(DestinationAreaX2, DestinationAreaY2), new WpfPoint(DestinationAreaX3, DestinationAreaY3), new WpfPoint(DestinationAreaX4, DestinationAreaY4)),
+                    out var updated);
+
+                if (updated)
+                {
+                    UpdateDestinationPoints();
+                }
+
+                return ret;
+            }
+        }
 
         public ObservableCollection<RefPoint> SourceAreaPoints { get; } = new();
 
@@ -126,12 +139,16 @@ namespace PerspectiveTest.ViewModels
 
         private WpfPoint TransformPointFromSourceToDestinationArea(Mat transformMatrix, WpfPoint point)
         {
-            Mat matrixPoint = new Mat<double>(3, 1, new Scalar(point.X, point.Y, 1));
+            Mat matrixPoint = new Mat<double>(3, 1);
+            matrixPoint.Set<double>(0, 0, point.X);
+            matrixPoint.Set<double>(1, 0, point.Y);
+            matrixPoint.Set<double>(2, 0, 1);
+
             Mat transformedPoint = transformMatrix * matrixPoint;
 
             var result = new WpfPoint(
-                transformedPoint.At<double>(0, 0),
-                transformedPoint.At<double>(1, 0));
+                transformedPoint.At<double>(0, 0) / transformedPoint.At<double>(2, 0),
+                transformedPoint.At<double>(1, 0) / transformedPoint.At<double>(2, 0));
 
             return result;
         }
@@ -149,6 +166,39 @@ namespace PerspectiveTest.ViewModels
         private void RemovePoint()
         {
             SourceAreaPoints.RemoveAt(SourceAreaPoints.Count - 1);
+        }
+
+        [RelayCommand]
+        private void Reset()
+        {
+            SourceAreaX1 = 10;
+            SourceAreaX2 = 100;
+            SourceAreaX3 = 100;
+            SourceAreaX4 = 10;
+            SourceAreaY1 = 10;
+            SourceAreaY2 = 10;
+            SourceAreaY3 = 100;
+            SourceAreaY4 = 100;
+
+            DestinationAreaX1 = 10;
+            DestinationAreaX2 = 100;
+            DestinationAreaX3 = 100;
+            DestinationAreaX4 = 10;
+            DestinationAreaY1 = 10;
+            DestinationAreaY2 = 10;
+            DestinationAreaY3 = 100;
+            DestinationAreaY4 = 100;
+
+            SourceAreaPoints.Clear();
+        }
+
+        [RelayCommand]
+        private void UpdateDestinationPoints()
+        {
+            foreach (var destinationPoint in DestinationAreaPoints)
+            {
+                destinationPoint.Update();
+            }
         }
     }
 }

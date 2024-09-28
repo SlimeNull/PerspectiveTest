@@ -7,7 +7,8 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-
+            Mat m = new Mat<float>(3, 1);
+            double value = m.Get<double>(0, 0);
         }
     }
 }

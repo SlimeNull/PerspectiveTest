@@ -95,11 +95,8 @@ namespace PerspectiveTest.Helpers
 
                 case NotifyCollectionChangedAction.Reset:
                 {
-                    var oldItems = new List<T>();
-                    oldItems.AddRange(_storage);
-
                     _storage.Clear();
-                    CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset, oldItems));
+                    CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
                     break;
                 }
             }

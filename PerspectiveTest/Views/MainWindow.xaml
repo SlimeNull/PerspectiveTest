@@ -5,11 +5,18 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PerspectiveTest.Views"
         xmlns:c="clr-namespace:PerspectiveTest.Controls"
+        xmlns:cvt="clr-namespace:PerspectiveTest.Converters"
         xmlns:vm="clr-namespace:PerspectiveTest.ViewModels"
         xmlns:ws="https://schemas.elecho.dev/wpfsuite"
+        xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
         d:DataContext="{d:DesignInstance Type={x:Type local:MainWindow}}">
+    <Window.Resources>
+        <ws:BindingProxy x:Key="ViewModelProxy" Data="{Binding ViewModel}"/>
+        <cvt:MatrixToStringConverter x:Key="MatrixToStringConverter"/>
+    </Window.Resources>
+
     <DockPanel>
         <Grid DockPanel.Dock="Bottom">
             <Border BorderThickness="0 1 0 0"
@@ -27,160 +34,196 @@
                             Command="{Binding ViewModel.AddPointCommand}"/>
                     <Button Content="Remove Point"
                             Command="{Binding ViewModel.RemovePointCommand}"/>
+                    <Button Content="Reset"
+                            Command="{Binding ViewModel.ResetCommand}"/>
                 </ws:StackPanel>
             </Border>
         </Grid>
 
         <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="4"/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="4"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
 
-            <Canvas Grid.Column="0">
-                <Canvas.Resources>
-                    <Style TargetType="c:HandlePointInCanvas">
-                        <Setter Property="Width" Value="10"/>
-                        <Setter Property="Height" Value="10"/>
-                        <Setter Property="Background" Value="Green"/>
-                    </Style>
-                    <Style TargetType="Line">
-                        <Setter Property="StrokeThickness" Value="3"/>
-                        <Setter Property="Stroke" Value="Purple"/>
-                    </Style>
-                </Canvas.Resources>
+                <Canvas Grid.Column="0"
+                        ClipToBounds="True">
+                    <Canvas.Resources>
+                        <Style TargetType="c:HandlePointInCanvas">
+                            <Setter Property="Width" Value="10"/>
+                            <Setter Property="Height" Value="10"/>
+                            <Setter Property="Background" Value="Green"/>
+                            <Setter Property="RenderTransform">
+                                <Setter.Value>
+                                    <TranslateTransform X="-5" Y="-5" />
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                        <Style TargetType="Line">
+                            <Setter Property="StrokeThickness" Value="3"/>
+                            <Setter Property="Stroke" Value="Purple"/>
+                        </Style>
+                    </Canvas.Resources>
 
-                <Line X1="{Binding ViewModel.SourceAreaX1}"
-                      Y1="{Binding ViewModel.SourceAreaY1}"
-                      X2="{Binding ViewModel.SourceAreaX2}"
-                      Y2="{Binding ViewModel.SourceAreaY2}"
-                      StrokeThickness="3"
-                      Stroke="Purple"/>
+                    <Line X1="{Binding ViewModel.SourceAreaX1}"
+                          Y1="{Binding ViewModel.SourceAreaY1}"
+                          X2="{Binding ViewModel.SourceAreaX2}"
+                          Y2="{Binding ViewModel.SourceAreaY2}"
+                          StrokeThickness="3"
+                          Stroke="Purple"/>
 
-                <Line X1="{Binding ViewModel.SourceAreaX2}"
-                      Y1="{Binding ViewModel.SourceAreaY2}"
-                      X2="{Binding ViewModel.SourceAreaX3}"
-                      Y2="{Binding ViewModel.SourceAreaY3}"
-                      StrokeThickness="3"
-                      Stroke="Purple"/>
+                    <Line X1="{Binding ViewModel.SourceAreaX2}"
+                          Y1="{Binding ViewModel.SourceAreaY2}"
+                          X2="{Binding ViewModel.SourceAreaX3}"
+                          Y2="{Binding ViewModel.SourceAreaY3}"
+                          StrokeThickness="3"
+                          Stroke="Purple"/>
 
-                <Line X1="{Binding ViewModel.SourceAreaX3}"
-                      Y1="{Binding ViewModel.SourceAreaY3}"
-                      X2="{Binding ViewModel.SourceAreaX4}"
-                      Y2="{Binding ViewModel.SourceAreaY4}"
-                      StrokeThickness="3"
-                      Stroke="Purple"/>
+                    <Line X1="{Binding ViewModel.SourceAreaX3}"
+                          Y1="{Binding ViewModel.SourceAreaY3}"
+                          X2="{Binding ViewModel.SourceAreaX4}"
+                          Y2="{Binding ViewModel.SourceAreaY4}"
+                          StrokeThickness="3"
+                          Stroke="Purple"/>
 
-                <Line X1="{Binding ViewModel.SourceAreaX4}"
-                      Y1="{Binding ViewModel.SourceAreaY4}"
-                      X2="{Binding ViewModel.SourceAreaX1}"
-                      Y2="{Binding ViewModel.SourceAreaY1}"
-                      StrokeThickness="3"
-                      Stroke="Purple"/>
+                    <Line X1="{Binding ViewModel.SourceAreaX4}"
+                          Y1="{Binding ViewModel.SourceAreaY4}"
+                          X2="{Binding ViewModel.SourceAreaX1}"
+                          Y2="{Binding ViewModel.SourceAreaY1}"
+                          StrokeThickness="3"
+                          Stroke="Purple"/>
 
-                <c:HandlePointInCanvas Canvas.Left="{Binding ViewModel.SourceAreaX1,Mode=TwoWay}"
-                                       Canvas.Top="{Binding ViewModel.SourceAreaY1,Mode=TwoWay}"/>
-                <c:HandlePointInCanvas Canvas.Left="{Binding ViewModel.SourceAreaX2,Mode=TwoWay}"
-                                       Canvas.Top="{Binding ViewModel.SourceAreaY2,Mode=TwoWay}"/>
-                <c:HandlePointInCanvas Canvas.Left="{Binding ViewModel.SourceAreaX3,Mode=TwoWay}"
-                                       Canvas.Top="{Binding ViewModel.SourceAreaY3,Mode=TwoWay}"/>
-                <c:HandlePointInCanvas Canvas.Left="{Binding ViewModel.SourceAreaX4,Mode=TwoWay}"
-                                       Canvas.Top="{Binding ViewModel.SourceAreaY4,Mode=TwoWay}"/>
-            </Canvas>
+                    <c:HandlePointInCanvas Canvas.Left="{Binding ViewModel.SourceAreaX1,Mode=TwoWay}"
+                                           Canvas.Top="{Binding ViewModel.SourceAreaY1,Mode=TwoWay}"/>
+                    <c:HandlePointInCanvas Canvas.Left="{Binding ViewModel.SourceAreaX2,Mode=TwoWay}"
+                                           Canvas.Top="{Binding ViewModel.SourceAreaY2,Mode=TwoWay}"/>
+                    <c:HandlePointInCanvas Canvas.Left="{Binding ViewModel.SourceAreaX3,Mode=TwoWay}"
+                                           Canvas.Top="{Binding ViewModel.SourceAreaY3,Mode=TwoWay}"/>
+                    <c:HandlePointInCanvas Canvas.Left="{Binding ViewModel.SourceAreaX4,Mode=TwoWay}"
+                                           Canvas.Top="{Binding ViewModel.SourceAreaY4,Mode=TwoWay}"/>
+                </Canvas>
 
-            <ItemsControl Grid.Column="0"
-                          ItemsSource="{Binding ViewModel.SourceAreaPoints}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <ws:BoxPanel/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Canvas>
-                            <c:HandlePointInCanvas Canvas.Left="{Binding X,Mode=TwoWay}"
-                                                   Canvas.Top="{Binding Y,Mode=TwoWay}"
-                                                   Background="Black"/>
-                        </Canvas>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                <ItemsControl Grid.Column="0"
+                              ItemsSource="{Binding ViewModel.SourceAreaPoints}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ws:BoxPanel ClipToBounds="True"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Canvas>
+                                <c:HandlePointInCanvas Canvas.Left="{Binding X,Mode=TwoWay}"
+                                                       Canvas.Top="{Binding Y,Mode=TwoWay}"
+                                                       Width="5"
+                                                       Height="5"
+                                                       Background="Black">
+                                    <b:Interaction.Triggers>
+                                        <b:EventTrigger>
+                                            <b:InvokeCommandAction Command="{Binding }"/>
+                                        </b:EventTrigger>
+                                    </b:Interaction.Triggers>
+                                </c:HandlePointInCanvas>
+                            </Canvas>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
-            <Canvas Grid.Column="2">
-                <Canvas.Resources>
-                    <Style TargetType="c:HandlePointInCanvas">
-                        <Setter Property="Width" Value="10"/>
-                        <Setter Property="Height" Value="10"/>
-                        <Setter Property="Background" Value="Green"/>
-                    </Style>
-                    <Style TargetType="Line">
-                        <Setter Property="StrokeThickness" Value="3"/>
-                        <Setter Property="Stroke" Value="Purple"/>
-                    </Style>
-                </Canvas.Resources>
+                <Canvas Grid.Column="2"
+                        ClipToBounds="True">
+                    <Canvas.Resources>
+                        <Style TargetType="c:HandlePointInCanvas">
+                            <Setter Property="Width" Value="10"/>
+                            <Setter Property="Height" Value="10"/>
+                            <Setter Property="Background" Value="Green"/>
+                            <Setter Property="RenderTransform">
+                                <Setter.Value>
+                                    <TranslateTransform X="-5" Y="-5" />
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                        <Style TargetType="Line">
+                            <Setter Property="StrokeThickness" Value="3"/>
+                            <Setter Property="Stroke" Value="Purple"/>
+                        </Style>
+                    </Canvas.Resources>
 
-                <Line X1="{Binding ViewModel.DestinationAreaX1}"
-                      Y1="{Binding ViewModel.DestinationAreaY1}"
-                      X2="{Binding ViewModel.DestinationAreaX2}"
-                      Y2="{Binding ViewModel.DestinationAreaY2}"
-                      StrokeThickness="3"
-                      Stroke="Purple"/>
+                    <Line X1="{Binding ViewModel.DestinationAreaX1}"
+                          Y1="{Binding ViewModel.DestinationAreaY1}"
+                          X2="{Binding ViewModel.DestinationAreaX2}"
+                          Y2="{Binding ViewModel.DestinationAreaY2}"
+                          StrokeThickness="3"
+                          Stroke="Purple"/>
 
-                <Line X1="{Binding ViewModel.DestinationAreaX2}"
-                      Y1="{Binding ViewModel.DestinationAreaY2}"
-                      X2="{Binding ViewModel.DestinationAreaX3}"
-                      Y2="{Binding ViewModel.DestinationAreaY3}"
-                      StrokeThickness="3"
-                      Stroke="Purple"/>
+                    <Line X1="{Binding ViewModel.DestinationAreaX2}"
+                          Y1="{Binding ViewModel.DestinationAreaY2}"
+                          X2="{Binding ViewModel.DestinationAreaX3}"
+                          Y2="{Binding ViewModel.DestinationAreaY3}"
+                          StrokeThickness="3"
+                          Stroke="Purple"/>
 
-                <Line X1="{Binding ViewModel.DestinationAreaX3}"
-                      Y1="{Binding ViewModel.DestinationAreaY3}"
-                      X2="{Binding ViewModel.DestinationAreaX4}"
-                      Y2="{Binding ViewModel.DestinationAreaY4}"
-                      StrokeThickness="3"
-                      Stroke="Purple"/>
+                    <Line X1="{Binding ViewModel.DestinationAreaX3}"
+                          Y1="{Binding ViewModel.DestinationAreaY3}"
+                          X2="{Binding ViewModel.DestinationAreaX4}"
+                          Y2="{Binding ViewModel.DestinationAreaY4}"
+                          StrokeThickness="3"
+                          Stroke="Purple"/>
 
-                <Line X1="{Binding ViewModel.DestinationAreaX4}"
-                      Y1="{Binding ViewModel.DestinationAreaY4}"
-                      X2="{Binding ViewModel.DestinationAreaX1}"
-                      Y2="{Binding ViewModel.DestinationAreaY1}"
-                      StrokeThickness="3"
-                      Stroke="Purple"/>
+                    <Line X1="{Binding ViewModel.DestinationAreaX4}"
+                          Y1="{Binding ViewModel.DestinationAreaY4}"
+                          X2="{Binding ViewModel.DestinationAreaX1}"
+                          Y2="{Binding ViewModel.DestinationAreaY1}"
+                          StrokeThickness="3"
+                          Stroke="Purple"/>
 
-                <c:HandlePointInCanvas Canvas.Left="{Binding ViewModel.DestinationAreaX1,Mode=TwoWay}"
-                                       Canvas.Top="{Binding ViewModel.DestinationAreaY1,Mode=TwoWay}"/>
-                <c:HandlePointInCanvas Canvas.Left="{Binding ViewModel.DestinationAreaX2,Mode=TwoWay}"
-                                       Canvas.Top="{Binding ViewModel.DestinationAreaY2,Mode=TwoWay}"/>
-                <c:HandlePointInCanvas Canvas.Left="{Binding ViewModel.DestinationAreaX3,Mode=TwoWay}"
-                                       Canvas.Top="{Binding ViewModel.DestinationAreaY3,Mode=TwoWay}"/>
-                <c:HandlePointInCanvas Canvas.Left="{Binding ViewModel.DestinationAreaX4,Mode=TwoWay}"
-                                       Canvas.Top="{Binding ViewModel.DestinationAreaY4,Mode=TwoWay}"/>
-            </Canvas>
+                    <c:HandlePointInCanvas Canvas.Left="{Binding ViewModel.DestinationAreaX1,Mode=TwoWay}"
+                                           Canvas.Top="{Binding ViewModel.DestinationAreaY1,Mode=TwoWay}"/>
+                    <c:HandlePointInCanvas Canvas.Left="{Binding ViewModel.DestinationAreaX2,Mode=TwoWay}"
+                                           Canvas.Top="{Binding ViewModel.DestinationAreaY2,Mode=TwoWay}"/>
+                    <c:HandlePointInCanvas Canvas.Left="{Binding ViewModel.DestinationAreaX3,Mode=TwoWay}"
+                                           Canvas.Top="{Binding ViewModel.DestinationAreaY3,Mode=TwoWay}"/>
+                    <c:HandlePointInCanvas Canvas.Left="{Binding ViewModel.DestinationAreaX4,Mode=TwoWay}"
+                                           Canvas.Top="{Binding ViewModel.DestinationAreaY4,Mode=TwoWay}"/>
+                </Canvas>
 
-            <ItemsControl Grid.Column="2"
-                          ItemsSource="{Binding ViewModel.DestinationAreaPoints}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <ws:BoxPanel/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Canvas>
-                            <Rectangle Canvas.Left="{Binding Value.X}"
-                                       Canvas.Top="{Binding Value.Y}"
-                                       Fill="Black"
-                                       Width="3"
-                                       Height="3"/>
-                        </Canvas>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                <ItemsControl Grid.Column="2"
+                              ItemsSource="{Binding ViewModel.DestinationAreaPoints}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ws:BoxPanel ClipToBounds="True"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Canvas>
+                                <Rectangle Canvas.Left="{Binding Value.X}"
+                                           Canvas.Top="{Binding Value.Y}"
+                                           Fill="Black"
+                                           Width="5"
+                                           Height="5"/>
+                            </Canvas>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
-            <GridSplitter Grid.Column="1"
-                          VerticalAlignment="Stretch"
-                          HorizontalAlignment="Stretch"/>
+                <GridSplitter Grid.Column="1"
+                              VerticalAlignment="Stretch"
+                              HorizontalAlignment="Stretch"/>
+            </Grid>
+
+            <Border Background="White"
+                    VerticalAlignment="Bottom"
+                    HorizontalAlignment="Center"
+                    BorderBrush="Gray"
+                    BorderThickness="1 1 1 0"
+                    CornerRadius="5 5 0 0"
+                    Padding="8">
+                <StackPanel>
+                    <TextBlock Text="{Binding ViewModel.SourceToDestinationMatrix,Converter={StaticResource MatrixToStringConverter}}"/>
+                </StackPanel>
+            </Border>
         </Grid>
     </DockPanel>
 </Window>

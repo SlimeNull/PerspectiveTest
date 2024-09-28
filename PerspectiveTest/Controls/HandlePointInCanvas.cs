@@ -6,13 +6,26 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using PerspectiveTest.Helpers;
 using PerspectiveTest.Utilities;
 
 namespace PerspectiveTest.Controls
 {
     class HandlePointInCanvas : ContentControl
     {
-        private Point _mouseLastPosition;
+        private Point _mouseStartPosition;
+        private CanvasItemPosition _startPosition;
+
+        public bool LimitInParent
+        {
+            get { return (bool)GetValue(LimitInParentProperty); }
+            set { SetValue(LimitInParentProperty, value); }
+        }
+
+        public static readonly DependencyProperty LimitInParentProperty =
+            DependencyProperty.Register(nameof(LimitInParent), typeof(bool), typeof(HandlePointInCanvas), new PropertyMetadata(true));
+
+
 
         static HandlePointInCanvas()
         {
@@ -21,7 +34,9 @@ namespace PerspectiveTest.Controls
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
-            _mouseLastPosition = e.GetPosition(null);
+            _mouseStartPosition = e.GetPosition(null);
+            _startPosition = CanvasItemPosition.CreateFrom(this);
+            
             CaptureMouse();
 
             base.OnMouseDown(e);
@@ -39,12 +54,36 @@ namespace PerspectiveTest.Controls
             if (IsMouseCaptured)
             {
                 var currentPosition = e.GetPosition(null);
-                var offset = currentPosition - _mouseLastPosition;
+                var offset = currentPosition - _mouseStartPosition;
 
-                CanvasUtilities.MoveHorizontal(this, offset.X);
-                CanvasUtilities.MoveVertical(this, offset.Y);
+                if (Keyboard.IsKeyDown(Key.LeftShift))
+                {
+                    if (Math.Abs(offset.X) > Math.Abs(offset.Y))
+                    {
+                        offset.Y = 0;
+                    }
+                    else
+                    {
+                        offset.X = 0;
+                    }
+                }
 
-                _mouseLastPosition = currentPosition;
+                if (Keyboard.IsKeyDown(Key.LeftCtrl))
+                {
+                    var distance = offset.Length;
+
+                    offset.X = Math.Sign(offset.X) * offset.Length;
+                    offset.Y = Math.Sign(offset.Y) * offset.Length;
+                }
+
+                var position = _startPosition.Offset(offset);
+
+                if (LimitInParent && Parent is FrameworkElement parentElement)
+                {
+                    position = position.Limit(parentElement.ActualWidth, parentElement.ActualHeight);
+                }
+
+                position.ApplyTo(this);
             }
 
             base.OnMouseMove(e);

@@ -34,6 +34,11 @@ namespace PerspectiveTest.Helpers
 
         private void From_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
+            Update();
+        }
+
+        public void Update()
+        {
             PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(nameof(Value)));
             _convertedValue = _converter.Invoke(_from);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
