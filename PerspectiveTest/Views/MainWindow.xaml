@@ -10,7 +10,7 @@
         xmlns:ws="https://schemas.elecho.dev/wpfsuite"
         xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
+        Title="Perspective Test" Height="450" Width="800"
         d:DataContext="{d:DesignInstance Type={x:Type local:MainWindow}}">
     <Window.Resources>
         <ws:BindingProxy x:Key="ViewModelProxy" Data="{Binding ViewModel}"/>
