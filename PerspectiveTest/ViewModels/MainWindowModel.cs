@@ -165,6 +165,11 @@ namespace PerspectiveTest.ViewModels
         [RelayCommand]
         private void RemovePoint()
         {
+            if (SourceAreaPoints.Count == 0)
+            {
+                return;
+            }
+
             SourceAreaPoints.RemoveAt(SourceAreaPoints.Count - 1);
         }
 
